@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Ícono entrelazado geométrico UYW4Q (Navy + Terracota) -->
+  <path d="M 28 20 C 18 20 12 30 12 45 C 12 60 22 75 42 75 C 55 75 65 68 70 56" 
+        stroke="#0D172E" stroke-width="9" stroke-linecap="round"/>
+  <path d="M 72 80 C 82 80 88 70 88 55 C 88 40 78 25 58 25 C 45 25 35 32 30 44" 
+        stroke="#D4513B" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="50" cy="50" r="5" fill="#D4513B"/>
+</svg>

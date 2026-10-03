@@ -1,0 +1,79 @@
+{
+  "normativa": "Decreto Supremo N° 016-2024-JUS (Reglamento de la Ley N° 29733 de Protección de Datos Personales del Perú)",
+  "valor_uit_referencial_soles": 5150,
+  "escala_sanciones": {
+    "leve": {
+      "rango_uit": "0.5 a 5 UIT",
+      "rango_soles": "S/ 2,575 a S/ 25,750",
+      "descripcion": "Incumplimiento de formalidades menores, falta de actualización del documento de seguridad sin riesgo crítico."
+    },
+    "grave": {
+      "rango_uit": "Más de 5 a 50 UIT",
+      "rango_soles": "S/ 25,750 a S/ 257,500",
+      "descripcion": "No implementar medidas técnicas de seguridad adecuadas (cifrado, control de correos contra phishing), omitir notificar brechas en el plazo de 48 horas."
+    },
+    "muy_grave": {
+      "rango_uit": "Más de 50 a 100 UIT",
+      "rango_soles": "S/ 257,500 a S/ 515,000",
+      "descripcion": "Tratamiento negligente reiterado de datos sensibles (salud, biometría, tarjetas de crédito) sin medidas de protección criptográfica o exponer masivamente bases de datos."
+    }
+  },
+  "articulos": [
+    {
+      "id": "art-38",
+      "articulo": "Artículo 38 - Medidas de Seguridad Técnicas y Organizativas",
+      "resumen": "Exige a todo titular de banco de datos implementar medidas técnicas que garanticen la confidencialidad, integridad y disponibilidad de la información, previniendo accesos no autorizados y suplantación de identidad.",
+      "hallazgos_relacionados": ["dmarc_ausente", "spf_invalido", "dkim_ausente"],
+      "impacto_por_rubro": {
+        "clinica": "La suplantación de correos institucionales permite a cibercriminales solicitar datos clínicos confidenciales de pacientes o falsificar órdenes médicas.",
+        "ecommerce": "Permite ataques de phishing directo a clientes compradores con comprobantes falsos de pago o enlaces de captura de tarjetas.",
+        "academia": "Facilita la filtración de notas, datos de menores de edad y desvío de pagos de pensiones educativas.",
+        "agencia": "Expone las comunicaciones confidenciales con clientes corporativos y contratos de confidencialidad.",
+        "delivery": "Permite interceptar geolocalizaciones de entrega, teléfonos y direcciones residenciales de usuarios."
+      },
+      "sancion_asociada": "grave"
+    },
+    {
+      "id": "art-39",
+      "articulo": "Artículo 39 - Cifrado y Seguridad de Comunicaciones en Tránsito (SSL/TLS)",
+      "resumen": "Establece la obligatoriedad de utilizar mecanismos robustos de cifrado en el tránsito de datos personales a través de redes públicas, garantizando que el canal web cuente con certificados vigentes y protocolos actualizados.",
+      "hallazgos_relacionados": ["ssl_vencido", "ssl_invalido", "ssl_por_vencer"],
+      "impacto_por_rubro": {
+        "clinica": "Transmisión de historias clínicas y resultados de laboratorio sin cifrado HTTPS seguro, infracción flagrante a la confidencialidad médica.",
+        "ecommerce": "Captura en texto plano de datos de tarjetas de crédito, credenciales de inicio de sesión y compras.",
+        "academia": "Interceptación de portales de estudiantes y docentes en redes Wi-Fi públicas.",
+        "agencia": "Vulnerabilidad de acceso a paneles administrativos y plataformas de clientes.",
+        "delivery": "Exposición de pasarelas de pago y datos de tarjetas asociadas al pedido."
+      },
+      "sancion_asociada": "grave"
+    },
+    {
+      "id": "art-42",
+      "articulo": "Artículo 42 - Notificación Obligatoria de Incidentes de Seguridad (Plazo de 48 Horas)",
+      "resumen": "El titular del banco de datos debe notificar a la Autoridad Nacional de Protección de Datos Personales (ANPPD) y al Centro Nacional de Seguridad Digital (CNSD) todo incidente de seguridad o fuga de datos en un plazo máximo e improrrogable de 48 horas desde su confirmación.",
+      "hallazgos_relacionados": ["breach_detectada", "credenciales_filtradas"],
+      "impacto_por_rubro": {
+        "clinica": "Omitir la notificación de fuga de datos sensibles de salud genera una imputación directa por infracción muy grave.",
+        "ecommerce": "No informar oportunamente a los usuarios afectados y al regulador genera sanciones acumulativas y demandas indemnizatorias.",
+        "academia": "Riesgo legal agravado por comprometer potencialmente información personal de menores de edad.",
+        "agencia": "Incumplimiento contractual de cláusulas de ciberseguridad con clientes corporativos e imposición de multas por el regulador.",
+        "delivery": "Exposición a sanciones administrativas inmediatas por el uso indebido de bases de datos de clientes masivos."
+      },
+      "sancion_asociada": "muy_grave"
+    },
+    {
+      "id": "art-45",
+      "articulo": "Artículo 45 - Evaluación de Impacto en la Protección de Datos Personales (EIPD)",
+      "resumen": "Obligatorio antes de iniciar tratamientos que entrañen un alto riesgo para los derechos de los titulares, especialmente al utilizar tecnologías intensivas, perfilamiento o datos de salud/financieros.",
+      "hallazgos_relacionados": ["datos_sensibles_expuestos"],
+      "impacto_por_rubro": {
+        "clinica": "Obligatorio en todo sistema de gestión hospitalaria o telemedicina por tratar datos de salud.",
+        "ecommerce": "Necesario cuando se realiza perfilamiento comercial automatizado o scoring crediticio.",
+        "academia": "Requerido si se implementan sistemas de reconocimiento facial o supervisión proctoring.",
+        "agencia": "Aplica si administran bancos de datos por cuenta de terceros (encargados de tratamiento).",
+        "delivery": "Aplica por el rastreo en tiempo real y perfilamiento de hábitos de consumo."
+      },
+      "sancion_asociada": "grave"
+    }
+  ]
+}

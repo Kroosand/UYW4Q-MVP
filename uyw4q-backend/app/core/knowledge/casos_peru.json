@@ -1,0 +1,31 @@
+{
+  "casos_documentados": [
+    {
+      "id": "interbank_2024",
+      "entidad": "Interbank",
+      "anio": 2024,
+      "sector": "Financiero",
+      "hecho": "Filtración pública masiva de información confidencial de clientes en foros clandestinos (BreachForums) por un actor no autorizado que exigía extorsión financiera.",
+      "cifra_impacto": "Más de 3 millones de registros de usuarios comprometidos, apertura de investigación sancionadora por Indecopi y la ANPPD.",
+      "leccion_tecnica": "Importancia del monitoreo activo de credenciales comprometidas y la obligatoriedad del reporte inmediato de brechas en menos de 48 horas bajo apercibimiento de multa máxima."
+    },
+    {
+      "id": "topitop_2023",
+      "entidad": "Topitop",
+      "anio": 2023,
+      "sector": "Retail / E-commerce",
+      "hecho": "Exposición no autorizada de base de datos con información de compras, nombres, correos electrónicos y teléfonos de clientes de su tienda virtual.",
+      "cifra_impacto": "Aproximadamente 1.5 millones de clientes expuestos a campañas dirigidas de smishing y spear phishing.",
+      "leccion_tecnica": "Ausencia de protocolos DMARC estrictos y controles de acceso perimetrales permite que cibercriminales suplanten la marca para engañar a los compradores."
+    },
+    {
+      "id": "upc_2023",
+      "entidad": "Universidad Peruana de Ciencias Aplicadas (UPC)",
+      "anio": 2023,
+      "sector": "Educación / Academia",
+      "hecho": "Incidente de seguridad donde se expusieron datos personales de postulantes y estudiantes registrados en formularios web institucionales.",
+      "cifra_impacto": "Decenas de miles de registros de alumnos y postulantes divulgados en canales de mensajería y foros.",
+      "leccion_tecnica": "El uso de canales web sin verificación exhaustiva de certificados ni aislamiento de datos sensibles infringe las disposiciones de seguridad mínimas exigidas por la autoridad peruana."
+    }
+  ]
+}

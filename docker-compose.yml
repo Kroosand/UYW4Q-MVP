@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./uyw4q-backend
+      dockerfile: Dockerfile
+    container_name: uyw4q-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=development
+      - APP_PORT=8000
+      - APP_HOST=0.0.0.0
+      - LLM_PROVIDER=mock
+      - HIBP_API_KEY=mock
+    volumes:
+      - ./uyw4q-backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./uyw4q-frontend
+      dockerfile: Dockerfile
+    container_name: uyw4q-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
