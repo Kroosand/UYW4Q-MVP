@@ -8,7 +8,7 @@ import IncidentNotificationModal from './components/IncidentNotificationModal';
 import { executeScan } from './services/api';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('landing'); // landing | loading | dashboard
+  const [currentView, setCurrentView] = useState('landing'); // 'landing' | 'loading' | 'dashboard'
   const [scanData, setScanData] = useState(null);
   const [activeDomain, setActiveDomain] = useState('');
   const [activeRubro, setActiveRubro] = useState('clinica');
@@ -23,10 +23,11 @@ export default function App() {
     setErrorMsg('');
 
     try {
-      // Simulación de tiempo de carga mínimo para que el usuario aprecie el escaneo
+      // Simulación de tiempo de carga mínimo (3.2s) para que el usuario/jurado
+      // aprecie la pantalla de carga interactiva y sus mensajes cambiantes (Bloque C, Secc. 3.2)
       const [result] = await Promise.all([
         executeScan(domain, rubro, isOfflineMode),
-        new Promise((resolve) => setTimeout(resolve, 3200)) // 3.2s para rotación de mensajes
+        new Promise((resolve) => setTimeout(resolve, 3400))
       ]);
 
       setScanData(result);
@@ -47,25 +48,28 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-sand-50 text-navy-950 font-sans selection:bg-terracota-100 selection:text-terracota-900">
       
-      {/* Header institucional */}
+      {/* Header Institucional con Logo Entrelazado */}
       <Header
         onReset={handleReset}
         isOfflineMode={isOfflineMode}
         setIsOfflineMode={setIsOfflineMode}
         onOpenIncidentModal={() => setShowIncidentModal(true)}
+        activeDomain={activeDomain}
+        activeRubro={activeRubro}
+        currentView={currentView}
       />
 
-      {/* Alerta de Error si ocurre */}
+      {/* Alerta de Error Controlada si ocurre algún problema */}
       {errorMsg && (
-        <div className="max-w-3xl mx-auto mt-4 px-4 w-full">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-xs flex justify-between items-center shadow-sm">
+        <div className="max-w-3xl mx-auto mt-4 px-4 w-full animate-fadeIn">
+          <div className="bg-red-50 border-2 border-red-300 text-red-800 px-5 py-3 rounded-2xl text-xs font-bold flex justify-between items-center shadow-sm">
             <span>⚠️ {errorMsg}</span>
-            <button onClick={() => setErrorMsg('')} className="font-bold ml-2">✕</button>
+            <button onClick={() => setErrorMsg('')} className="font-black text-base ml-2">✕</button>
           </div>
         </div>
       )}
 
-      {/* Contenido Principal según el estado */}
+      {/* Contenido Principal de las 6 Pantallas */}
       <main className="flex-1">
         {currentView === 'landing' && (
           <LandingPage
@@ -91,7 +95,7 @@ export default function App() {
         )}
       </main>
 
-      {/* Modal Global de Notificación de Brecha CNSD */}
+      {/* Modal Global de Notificación de Brecha CNSD (48 Horas) */}
       {showIncidentModal && (
         <IncidentNotificationModal
           initialDomain={activeDomain || 'empresa-ejemplo.pe'}
@@ -100,7 +104,7 @@ export default function App() {
         />
       )}
 
-      {/* Footer con descargo normativo */}
+      {/* Footer con Descargo de Responsabilidad y Ley de Delitos Informáticos */}
       <Footer />
 
     </div>

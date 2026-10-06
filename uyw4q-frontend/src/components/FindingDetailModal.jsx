@@ -1,84 +1,137 @@
 import React from 'react';
+import { getJargonExplanation } from '../utils/jargon';
 
 export default function FindingDetailModal({ finding, scanData, onClose }) {
   if (!finding) return null;
 
+  const jargon = getJargonExplanation(finding.finding + " " + (finding.business_risk || ""));
+  const urgency = (finding.urgency || "media").toLowerCase();
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-950/70 backdrop-blur-sm animate-fadeIn">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-950/80 backdrop-blur-sm animate-fadeIn"
+      onClick={onClose}
+    >
       <div 
-        className="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-9 shadow-2xl border-2 border-slate-200 relative max-h-[92vh] overflow-y-auto space-y-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Botón cerrar */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-slate-400 hover:text-navy-950 text-xl font-bold p-1 rounded-lg hover:bg-slate-100 transition-colors"
+          className="absolute top-6 right-6 text-slate-400 hover:text-navy-950 text-xl font-black p-2 rounded-xl hover:bg-slate-100 transition-colors"
+          aria-label="Cerrar modal"
         >
           ✕
         </button>
 
         {/* Encabezado */}
-        <div className="mb-6">
-          <span className="text-xs font-bold uppercase tracking-wider text-terracota-600 bg-terracota-50 px-2.5 py-1 rounded border border-terracota-200 inline-block mb-2">
-            Detalle Técnico y Jurídico
-          </span>
-          <h3 className="text-2xl font-extrabold text-navy-950 leading-tight">
+        <div>
+          <div className="flex items-center space-x-2.5 mb-2">
+            <span className="text-xs font-black uppercase tracking-wider text-terracota-700 bg-terracota-100 px-3 py-1 rounded-full border border-terracota-300">
+              Profundización Técnica y Jurídica
+            </span>
+            <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${
+              urgency === 'alta' ? 'bg-red-100 text-red-900 border border-red-300' : 'bg-amber-100 text-amber-900 border border-amber-300'
+            }`}>
+              Urgencia {finding.urgency}
+            </span>
+          </div>
+          <h3 className="text-2xl sm:text-3xl font-black text-navy-950 leading-tight">
             {finding.finding}
           </h3>
         </div>
 
-        {/* Sección 1: Riesgo Comercial Directo */}
-        <div className="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
-            💼 Impacto Real en el Negocio ({scanData?.rubro?.toUpperCase() || "EMPRESA"})
+        {/* Traducción de siglas técnicas si aplica */}
+        {jargon && (
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs text-navy-950 space-y-1">
+            <span className="font-extrabold text-terracota-600 uppercase tracking-wider block">
+              Traducción técnica para la gerencia ({jargon.term})
+            </span>
+            <p className="text-slate-700 leading-relaxed font-medium">
+              {jargon.oneLiner}
+            </p>
+          </div>
+        )}
+
+        {/* 1. Impacto comercial y de reputación en el rubro */}
+        <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-1.5">
+          <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
+            Riesgo Real para su Empresa ({scanData?.rubro?.toUpperCase() || "MYPE"})
           </h4>
-          <p className="text-sm text-navy-900 leading-relaxed font-medium">
+          <p className="text-sm font-semibold text-navy-950 leading-relaxed">
             {finding.business_risk}
           </p>
         </div>
 
-        {/* Sección 2: Marco Normativo Peruano */}
-        <div className="mb-6 bg-amber-50/60 p-4 rounded-xl border border-amber-200/80">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-amber-800 mb-1">
-            ⚖️ Referencia Legal y Régimen Sancionador
-          </h4>
-          <p className="text-sm font-semibold text-navy-900 mb-2">
+        {/* 2. Régimen Legal Peruano y Sanciones (D.S. 016-2024-JUS) */}
+        <div className="bg-amber-50/70 p-5 rounded-2xl border border-amber-200 space-y-3">
+          <div className="flex items-center space-x-2 text-amber-900 font-extrabold text-xs uppercase tracking-wider">
+            <span>Régimen Sancionador bajo D.S. N° 016-2024-JUS</span>
+          </div>
+          
+          <p className="text-sm font-extrabold text-navy-950">
             {finding.legal_reference}
           </p>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            Conforme al <strong>D.S. 016-2024-JUS</strong>, el incumplimiento de las directivas mínimas de seguridad informática para la protección de bancos de datos personales puede acarrear sanciones de la Autoridad Nacional de Protección de Datos Personales (ANPPD) que oscilan entre <strong>0.5 UIT hasta 100 UIT</strong> (equivalente a más de S/ 500,000).
-          </p>
-        </div>
 
-        {/* Sección 3: Evidencia Técnica Determinística */}
-        <div className="mb-6">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-            🔍 Evidencia Técnica Recopilada
-          </h4>
-          <div className="bg-navy-950 text-slate-300 p-4 rounded-xl font-mono text-xs overflow-x-auto space-y-1">
-            <div><strong>Dominio:</strong> {scanData?.domain}</div>
-            <div><strong>DMARC:</strong> {scanData?.dns_findings?.dmarc?.details || "No configurado"}</div>
-            <div><strong>SPF:</strong> {scanData?.dns_findings?.spf?.details || "No configurado"}</div>
-            <div><strong>SSL Emisor:</strong> {scanData?.ssl_findings?.issuer || "No disponible"} ({scanData?.ssl_findings?.expires_in_days} días restantes)</div>
-            <div><strong>Filtraciones detectadas:</strong> {scanData?.breach_findings?.emails_breached || 0} cuentas</div>
+          <div className="text-xs text-slate-700 space-y-2 pt-2 border-t border-amber-200/80 leading-relaxed font-medium">
+            <p>
+              El reglamento establece que la omisión de medidas técnicas idóneas de autenticación y cifrado constituye una infracción sujeta a fiscalización por la Autoridad Nacional de Protección de Datos Personales (ANPPD):
+            </p>
+            <ul className="list-disc pl-5 space-y-1 text-slate-800">
+              <li><strong>Infracción Grave:</strong> Multas superiores a 5 UIT y hasta 50 UIT (<strong>S/ 25,750 a S/ 257,500</strong>).</li>
+              <li><strong>Infracción Muy Grave:</strong> Multas de más de 50 UIT hasta 100 UIT (<strong>S/ 257,500 a S/ 515,000</strong>) en caso de exposición negligente de datos sensibles.</li>
+            </ul>
           </div>
         </div>
 
-        {/* Qué hacer ahora */}
-        <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-200 mb-6">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1">
-            🛠️ Acción Recomendada Inmediata
+        {/* 3. Evidencia Técnica Específica y Determinística */}
+        <div className="space-y-2">
+          <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
+            Evidencia Técnica Determinística Recopilada
           </h4>
-          <p className="text-xs text-emerald-950 leading-relaxed">
-            Contacte a su proveedor de correo institucional o hosting web y solicite la activación de una directiva <code>DMARC p=quarantine</code> o <code>p=reject</code> en sus registros de zona DNS, así como la actualización y reseteo de claves del personal corporativo.
+          <div className="bg-navy-950 text-slate-200 p-4 rounded-2xl font-mono text-xs overflow-x-auto space-y-1.5 border border-navy-800">
+            <div className="text-slate-400"># Dominio evaluado: {scanData?.domain}</div>
+            {scanData?.dns_findings?.dmarc && (
+              <div>
+                <span className="text-terracota-400">DMARC Record:</span> {scanData.dns_findings.dmarc.raw || "No publicado en _dmarc"} 
+                <span className="text-slate-400"> (Política: {scanData.dns_findings.dmarc.policy || 'ninguna'})</span>
+              </div>
+            )}
+            {scanData?.dns_findings?.spf && (
+              <div>
+                <span className="text-terracota-400">SPF Record:</span> {scanData.dns_findings.spf.raw || "No publicado en zona TXT"}
+              </div>
+            )}
+            {scanData?.ssl_findings && (
+              <div>
+                <span className="text-terracota-400">SSL Emisor:</span> {scanData.ssl_findings.issuer} 
+                <span className="text-slate-400"> (Expira en: {scanData.ssl_findings.expires_in_days} días)</span>
+              </div>
+            )}
+            {scanData?.breach_findings && (
+              <div>
+                <span className="text-terracota-400">Breaches Públicos:</span> {scanData.breach_findings.emails_breached} cuentas comprometidas en fuentes abiertas
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 4. Plan de Acción y Remediación Inmediata */}
+        <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-200 space-y-2">
+          <h4 className="text-xs font-extrabold uppercase tracking-wider text-emerald-900">
+            Plan de Remediación Sugerido
+          </h4>
+          <p className="text-xs text-emerald-950 leading-relaxed font-medium">
+            {jargon?.howToFix || "Coordine con el administrador de sus servicios web la actualización inmediata de los registros perimetrales y asegure el cumplimiento de las salvaguardas legales."}
           </p>
         </div>
 
-        {/* Botón Cerrar */}
-        <div className="flex justify-end">
+        {/* Botón de cierre */}
+        <div className="flex justify-end pt-2">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-navy-950 hover:bg-navy-900 text-white font-semibold text-sm transition-colors"
+            className="px-6 py-3 rounded-xl bg-navy-950 hover:bg-navy-900 text-white font-extrabold text-xs transition-colors shadow-sm"
           >
             Entendido, volver al informe
           </button>

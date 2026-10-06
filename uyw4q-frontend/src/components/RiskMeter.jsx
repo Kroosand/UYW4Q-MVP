@@ -1,52 +1,58 @@
 import React from 'react';
 
 export default function RiskMeter({ score, level }) {
-  // Configuración de colores y etiquetas por nivel
-  let colorClass = "text-emerald-500";
-  let strokeClass = "#10B981";
-  let bgBadge = "bg-emerald-950/80 text-emerald-400 border-emerald-700/60";
-  let levelText = "RIESGO BAJO";
-  let description = "Postura defensiva aceptable. Cumple los estándares base.";
+  // Configuración de colores, contraste y textos por nivel (Alta legibilidad para proyectores)
+  let strokeColor = "#059669"; // Emerald 600
+  let textColor = "text-emerald-700";
+  let badgeStyle = "bg-emerald-100 text-emerald-900 border-2 border-emerald-400";
+  let levelTitle = "RIESGO BAJO";
+  let queTanMalEstoy = "Su negocio cuenta con las protecciones técnicas fundamentales activas. No se detectan brechas críticas de suplantación ni multas inminentes.";
+  let queHagoAhora = "Mantenga revisiones periódicas y verifique que las renovaciones de certificados no se venzan.";
 
   if (score >= 60 || level === "alto" || level === "critico") {
-    colorClass = "text-terracota-500";
-    strokeClass = "#E05A47";
-    bgBadge = "bg-terracota-950/80 text-terracota-400 border-terracota-800/80";
-    levelText = "RIESGO ALTO / CRÍTICO";
-    description = "Vulnerabilidades graves detectadas. Alta probabilidad de multas bajo el D.S. 016-2024-JUS.";
+    strokeColor = "#C2410C"; // Terracota 700
+    textColor = "text-terracota-700";
+    badgeStyle = "bg-terracota-100 text-terracota-950 border-2 border-terracota-500";
+    levelTitle = "RIESGO ALTO / CRÍTICO";
+    queTanMalEstoy = "Su empresa presenta vulnerabilidades severas que permiten a terceros suplantar su identidad y exponer datos de clientes, con riesgo de multas de hasta 50 UIT (S/ 257,500) según el D.S. 016-2024-JUS.";
+    queHagoAhora = "Atienda de inmediato los hallazgos en color terracota que figuran abajo. Cada tarjeta detalla la solución técnica en una línea.";
   } else if (score >= 30 || level === "medio") {
-    colorClass = "text-amber-500";
-    strokeClass = "#F59E0B";
-    bgBadge = "bg-amber-950/80 text-amber-400 border-amber-800/70";
-    levelText = "RIESGO MODERADO";
-    description = "Existen fallas de configuración que facilitan ataques o incumplimiento parcial.";
+    strokeColor = "#D97706"; // Amber 600
+    textColor = "text-amber-700";
+    badgeStyle = "bg-amber-100 text-amber-950 border-2 border-amber-500";
+    levelTitle = "RIESGO MODERADO";
+    queTanMalEstoy = "Existen configuraciones incompletas o en modo pasivo que reducen la seguridad de sus comunicaciones y pueden infringir directivas básicas de datos personales.";
+    queHagoAhora = "Actualice las directivas de correo o certificados señalados en las tarjetas amarillas antes de que escalen a incidentes reales.";
   }
 
-  // Dimensiones del círculo SVG
-  const radius = 64;
+  // Dimensiones del círculo SVG para máxima claridad
+  const radius = 68;
   const circumference = 2 * Math.PI * radius;
   const progressOffset = circumference - (score / 100) * circumference;
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-6">
+    <section 
+      aria-label="Puntaje de riesgo"
+      className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border-2 border-slate-200 flex flex-col lg:flex-row items-center justify-between gap-8"
+    >
       
-      {/* Medidor Circular SVG de Alta Fidelidad */}
-      <div className="relative flex items-center justify-center">
-        <svg className="w-40 h-40 transform -rotate-90">
+      {/* 1. Medidor Circular SVG de Gran Escala (Legible en pantalla proyectada) */}
+      <div className="relative flex items-center justify-center shrink-0">
+        <svg className="w-48 h-48 sm:w-52 sm:h-52 transform -rotate-90">
           <circle
-            cx="80"
-            cy="80"
+            cx="96"
+            cy="96"
             r={radius}
             stroke="#E2E8F0"
-            strokeWidth="12"
+            strokeWidth="14"
             fill="transparent"
           />
           <circle
-            cx="80"
-            cy="80"
+            cx="96"
+            cy="96"
             r={radius}
-            stroke={strokeClass}
-            strokeWidth="12"
+            stroke={strokeColor}
+            strokeWidth="14"
             strokeDasharray={circumference}
             strokeDashoffset={progressOffset}
             strokeLinecap="round"
@@ -55,45 +61,68 @@ export default function RiskMeter({ score, level }) {
           />
         </svg>
 
-        {/* Texto central del puntaje */}
+        {/* Cifra central de alto impacto */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <span className={`text-4xl font-extrabold tracking-tight ${colorClass}`}>
+          <span className={`text-5xl sm:text-6xl font-black tracking-tight ${textColor}`}>
             {score}
           </span>
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+          <span className="text-xs font-black text-slate-500 uppercase tracking-widest mt-0.5">
             de 100
           </span>
         </div>
       </div>
 
-      {/* Explicación de Negocio en Español Simple */}
-      <div className="flex-1 text-center sm:text-left space-y-2">
-        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-          <span className={`px-3 py-1 text-xs font-bold uppercase rounded-full border ${bgBadge}`}>
-            {levelText}
+      {/* 2. Respuestas Directas al Dueño del Negocio: "¿Qué tan mal estoy y qué hago ahora?" */}
+      <div className="flex-1 space-y-4 text-center lg:text-left">
+        
+        {/* Badge de Nivel */}
+        <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
+          <span className={`px-4 py-1.5 text-xs font-black uppercase rounded-full shadow-sm ${badgeStyle}`}>
+            {levelTitle}
           </span>
-          <span className="text-xs text-slate-500">
-            Escala Heurística D.S. 016-2024-JUS
+          <span className="text-xs font-bold text-slate-500">
+            Escala Regulatoria D.S. N° 016-2024-JUS
           </span>
         </div>
 
-        <h3 className="text-xl font-bold text-navy-950">
-          Índice de Exposición Digital
-        </h3>
-
-        <p className="text-sm text-slate-600 leading-relaxed">
-          {description}
-        </p>
-
-        <div className="pt-2 text-xs text-slate-500 border-t border-slate-100 flex items-center justify-center sm:justify-start space-x-4">
-          <span>0-29: Seguro</span>
-          <span>•</span>
-          <span>30-59: Atención</span>
-          <span>•</span>
-          <span className="text-terracota-600 font-semibold">60-100: Vulnerabilidad Severa</span>
+        {/* Respuesta 1: ¿Qué tan mal estoy? */}
+        <div className="space-y-1">
+          <h3 className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+            ¿Qué tan expuesto está mi negocio?
+          </h3>
+          <p className="text-base sm:text-lg font-bold text-navy-950 leading-snug">
+            {queTanMalEstoy}
+          </p>
         </div>
+
+        {/* Respuesta 2: ¿Qué hago ahora? */}
+        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left space-y-1">
+          <span className="text-xs font-extrabold text-navy-900 uppercase tracking-wider block">
+            ¿Qué tengo que hacer ahora?
+          </span>
+          <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
+            {queHagoAhora}
+          </p>
+        </div>
+
+        {/* Escala de referencia visual */}
+        <div className="pt-2 flex items-center justify-center lg:justify-start space-x-6 text-xs text-slate-500 font-medium border-t border-slate-100">
+          <div className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <span>0-29: Bajo</span>
+          </div>
+          <div className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+            <span>30-59: Medio</span>
+          </div>
+          <div className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-terracota-600"></span>
+            <span className="font-bold text-terracota-700">60-100: Alto / Crítico</span>
+          </div>
+        </div>
+
       </div>
 
-    </div>
+    </section>
   );
 }

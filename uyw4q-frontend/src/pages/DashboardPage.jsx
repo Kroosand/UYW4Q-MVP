@@ -7,148 +7,97 @@ import ReportView from '../components/ReportView';
 export default function DashboardPage({ scanData, onReset, onOpenIncidentModal }) {
   const [selectedFinding, setSelectedFinding] = useState(null);
   const [showReport, setShowReport] = useState(false);
+  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
 
   if (!scanData) return null;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       
-      {/* Barra de Contexto del Dominio Escaneado */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-5 rounded-2xl border border-slate-200 shadow-sm gap-4">
-        <div>
-          <div className="flex items-center space-x-2">
-            <h2 className="text-2xl font-black text-navy-950">
+      {/* 1. Barra de Contexto del Cliente y Acciones Rápidas */}
+      <section 
+        aria-label="Información del cliente diagnosticado"
+        className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+      >
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h2 className="text-2xl sm:text-3xl font-black text-navy-950 font-mono tracking-tight">
               {scanData.domain}
             </h2>
-            <span className="text-xs font-bold uppercase px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-300">
-              {scanData.rubro}
+            <span className="text-xs font-black uppercase px-3 py-1 rounded-full bg-navy-950 text-white shadow-xs">
+              Sector: {scanData.rubro}
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Diagnóstico ejecutado el {new Date(scanData.timestamp).toLocaleDateString('es-PE')} a las {new Date(scanData.timestamp).toLocaleTimeString('es-PE')}
+          <p className="text-xs text-slate-500 font-medium">
+            Diagnóstico pasivo ejecutado el {new Date(scanData.timestamp).toLocaleDateString('es-PE')} a las {new Date(scanData.timestamp).toLocaleTimeString('es-PE')}
           </p>
         </div>
 
-        {/* Acciones Rápidas */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        {/* Acciones del Pitch y Reportes */}
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           <button
             onClick={() => setShowReport(true)}
-            className="px-4 py-2 rounded-xl bg-navy-950 hover:bg-navy-900 text-white font-bold text-xs flex items-center space-x-1.5 transition-colors shadow-sm"
+            className="flex-1 md:flex-initial px-5 py-2.5 rounded-xl bg-navy-950 hover:bg-navy-900 text-white font-extrabold text-xs shadow-md transition-all flex items-center justify-center space-x-2"
           >
-            <span>📄</span>
             <span>Descargar Reporte PDF</span>
+            <span>↓</span>
           </button>
 
           <button
             onClick={onOpenIncidentModal}
-            className="px-3.5 py-2 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 font-bold text-xs transition-colors"
+            className="flex-1 md:flex-initial px-4 py-2.5 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 font-extrabold text-xs transition-colors flex items-center justify-center space-x-1.5"
+            title="Formulario para el Centro Nacional de Seguridad Digital (MINJUS)"
           >
-            ⚠️ Reportar Incidente (CNSD)
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+            <span>Notificar Brecha CNSD (48h)</span>
           </button>
 
           <button
             onClick={onReset}
-            className="px-3 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 font-semibold text-xs transition-colors"
+            className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 font-bold text-xs transition-colors"
           >
             Otro Dominio
           </button>
         </div>
-      </div>
+      </section>
 
-      {/* 1. Medidor de Riesgo Circular Principal */}
+      {/* 2. El Puntaje de Riesgo Visible de Inmediato, Arriba de Todo (Bloque C, Secc. 3) */}
       <RiskMeter 
         score={scanData.risk_score} 
         level={scanData.risk_level} 
       />
 
-      {/* 2. Dictamen para el Dueño del Negocio (Sin tecnicismos) */}
-      <div className="bg-gradient-to-r from-navy-900 to-navy-950 rounded-2xl p-6 sm:p-7 text-white shadow-lg border border-navy-800 space-y-2">
-        <div className="flex items-center space-x-2 text-terracota-400 text-xs font-bold uppercase tracking-wider">
-          <span>💡 Resumen Ejecutivo para la Gerencia:</span>
+      {/* 3. Dictamen en Español Simple para el Dueño del Negocio (Sin tecnicismos) */}
+      <section 
+        aria-label="Resumen ejecutivo para la gerencia"
+        className="bg-navy-950 rounded-3xl p-6 sm:p-8 text-white shadow-lg border border-navy-800 space-y-2.5"
+      >
+        <div className="flex items-center space-x-2 text-terracota-400 text-xs font-black uppercase tracking-wider">
+          <span className="w-2 h-2 rounded-full bg-terracota-500"></span>
+          <span>Dictamen Ejecutivo para la Gerencia ({scanData.rubro.toUpperCase()}):</span>
         </div>
-        <p className="text-base sm:text-lg text-slate-100 font-medium leading-relaxed">
+        <p className="text-base sm:text-xl text-slate-100 font-bold leading-relaxed">
           "{scanData.summary_for_owner}"
         </p>
-      </div>
+      </section>
 
-      {/* 3. Indicadores de Postura Técnica (Resumen visual) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* DNS Status */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-xl shrink-0">
-            {scanData.dns_findings.dmarc.present ? '🛡️' : '⚠️'}
-          </div>
+      {/* 4. Hallazgos Priorizados en Tarjetas Simples por Color (Bloque C, Secc. 3) */}
+      <section aria-label="Hallazgos priorizados" className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-              Protección de Correo
-            </span>
-            <span className="text-sm font-bold text-navy-950">
-              {scanData.dns_findings.dmarc.present 
-                ? `DMARC Activo (${scanData.dns_findings.dmarc.policy})` 
-                : 'Sin DMARC (Vulnerable)'}
-            </span>
-            <span className="text-xs text-slate-500 block truncate max-w-[200px]">
-              SPF: {scanData.dns_findings.spf.present ? 'Configurado' : 'Ausente'}
-            </span>
-          </div>
-        </div>
-
-        {/* SSL Status */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-xl shrink-0">
-            {scanData.ssl_findings.valid ? '🔒' : '❌'}
-          </div>
-          <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-              Cifrado Web (SSL/TLS)
-            </span>
-            <span className="text-sm font-bold text-navy-950">
-              {scanData.ssl_findings.valid ? 'Certificado Válido' : 'Certificado Inválido'}
-            </span>
-            <span className="text-xs text-slate-500 block">
-              {scanData.ssl_findings.expires_in_days} días de vigencia restante
-            </span>
-          </div>
-        </div>
-
-        {/* Breaches Status */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-xl shrink-0">
-            {scanData.breach_findings.emails_breached > 0 ? '🚨' : '✅'}
-          </div>
-          <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-              Credenciales Filtradas
-            </span>
-            <span className="text-sm font-bold text-navy-950">
-              {scanData.breach_findings.emails_breached > 0 
-                ? `${scanData.breach_findings.emails_breached} Expuestas` 
-                : 'Sin Filtraciones Detectadas'}
-            </span>
-            <span className="text-xs text-slate-500 block">
-              Monitoreo HaveIBeenPwned
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* 4. Tarjetas de Hallazgos Priorizados (Bloque B) */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-xl font-extrabold text-navy-950">
-              Hallazgos Priorizados e Impacto Legal (D.S. 016-2024-JUS)
+            <h3 className="text-xl sm:text-2xl font-black text-navy-950">
+              Hallazgos Priorizados & Riesgo Legal (D.S. 016-2024-JUS)
             </h3>
-            <p className="text-xs text-slate-500">
-              Haga clic sobre cualquier tarjeta para ver el sustento técnico y la escala de multas aplicable.
+            <p className="text-xs text-slate-500 font-medium">
+              Ordenados por severidad. Haga clic en cualquier tarjeta para ver el plan de remediación y la multa en soles aplicable.
             </p>
           </div>
-          <span className="text-xs font-semibold text-slate-400">
-            {scanData.priority_findings.length} hallazgo(s)
+          <span className="text-xs font-bold text-slate-400">
+            {scanData.priority_findings.length} puntos prioritarios
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {scanData.priority_findings.map((finding, idx) => (
             <FindingCard
               key={idx}
@@ -157,7 +106,72 @@ export default function DashboardPage({ scanData, onReset, onOpenIncidentModal }
             />
           ))}
         </div>
-      </div>
+      </section>
+
+      {/* 5. Comprobación Técnica Pasiva (Desplegable secundario, sin saturar la primera impresión) */}
+      <section className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-sm font-extrabold text-navy-950 uppercase tracking-wider">
+              Comprobaciones Técnicas Pasivas (Sin Intrusión)
+            </h4>
+            <p className="text-xs text-slate-500">
+              Datos verificables obtenidos exclusivamente de registros públicos.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
+            className="text-xs font-bold text-terracota-600 hover:text-terracota-700 underline"
+          >
+            {showTechnicalDetails ? 'Ocultar detalles' : 'Mostrar registros técnicos'}
+          </button>
+        </div>
+
+        {showTechnicalDetails && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+            {/* Correo y DNS */}
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                Canal de Correo Electrónico
+              </span>
+              <div className="text-xs font-extrabold text-navy-950">
+                DMARC: {scanData.dns_findings.dmarc.present ? `Activo (${scanData.dns_findings.dmarc.policy})` : 'No configurado'}
+              </div>
+              <div className="text-xs text-slate-600">
+                SPF: {scanData.dns_findings.spf.present ? 'Válido' : 'No configurado'}
+              </div>
+            </div>
+
+            {/* SSL / Cifrado Web */}
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                Cifrado Web (SSL/TLS)
+              </span>
+              <div className="text-xs font-extrabold text-navy-950">
+                {scanData.ssl_findings.valid ? 'Certificado Válido' : 'Certificado Vencido / Inválido'}
+              </div>
+              <div className="text-xs text-slate-600">
+                {scanData.ssl_findings.expires_in_days} días de vigencia restante
+              </div>
+            </div>
+
+            {/* Filtraciones HIBP */}
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                Exposición en Filtraciones
+              </span>
+              <div className="text-xs font-extrabold text-navy-950">
+                {scanData.breach_findings.emails_breached > 0 
+                  ? `${scanData.breach_findings.emails_breached} credenciales detectadas` 
+                  : 'Sin credenciales expuestas'}
+              </div>
+              <div className="text-xs text-slate-600">
+                Monitoreo pasivo en bases abiertas
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
 
       {/* Modal de Detalle al Expandir Tarjeta */}
       {selectedFinding && (
