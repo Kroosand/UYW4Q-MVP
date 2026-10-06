@@ -1,41 +1,7 @@
 import React, { useState } from 'react';
 
-const RUBRO_OPTIONS = [
-  { 
-    id: 'clinica', 
-    label: 'Clínica / Salud', 
-    iconText: 'Salud', 
-    description: 'Historias clínicas, diagnósticos y datos médicos altamente sensibles (Art. 45)' 
-  },
-  { 
-    id: 'ecommerce', 
-    label: 'E-Commerce / Tienda', 
-    iconText: 'Comercio', 
-    description: 'Tarjetas de crédito, pasarelas de pago, direcciones y cuentas de compradores' 
-  },
-  { 
-    id: 'academia', 
-    label: 'Educación / Academia', 
-    iconText: 'Educación', 
-    description: 'Calificaciones, datos de menores de edad, matrículas y registros de postulantes' 
-  },
-  { 
-    id: 'agencia', 
-    label: 'Agencia / B2B', 
-    iconText: 'Servicios', 
-    description: 'Contratos corporativos, acuerdos confidenciales y bancos de datos de clientes' 
-  },
-  { 
-    id: 'delivery', 
-    label: 'Delivery / Logística', 
-    iconText: 'Logística', 
-    description: 'Geolocalización en tiempo real, teléfonos de clientes y pagos contraentrega' 
-  },
-];
-
-export default function LandingPage({ onStartScan, defaultDomain = '', defaultRubro = 'clinica' }) {
+export default function LandingPage({ onStartScan, defaultDomain = '' }) {
   const [domain, setDomain] = useState(defaultDomain);
-  const [rubro, setRubro] = useState(defaultRubro);
   const [inputError, setInputError] = useState('');
 
   const cleanDomainInput = (raw) => {
@@ -55,18 +21,17 @@ export default function LandingPage({ onStartScan, defaultDomain = '', defaultRu
       return;
     }
     setInputError('');
-    onStartScan(clean, rubro);
+    onStartScan(clean, 'auto');
   };
 
   const handleSelectPreset = (presetDomain, presetRubro) => {
     setDomain(presetDomain);
-    setRubro(presetRubro);
     onStartScan(presetDomain, presetRubro);
   };
 
   return (
     <div className="min-h-[85vh] flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-12">
-      <div className="max-w-4xl w-full text-center space-y-8 animate-fadeIn">
+      <div className="max-w-3xl w-full text-center space-y-8 animate-fadeIn">
         
         {/* Badge Institucional Oficial */}
         <div className="inline-flex items-center space-x-2.5 px-4 py-1.5 rounded-full bg-navy-950/5 border border-navy-900/10 text-navy-900 text-xs font-black shadow-xs">
@@ -86,23 +51,28 @@ export default function LandingPage({ onStartScan, defaultDomain = '', defaultRu
 
         {/* Formulario de Entrada Principal */}
         <div className="bg-white p-6 sm:p-10 rounded-3xl shadow-xl border-2 border-slate-200 text-left">
-          <form onSubmit={handleSubmit} className="space-y-7">
+          <form onSubmit={handleSubmit} className="space-y-6">
             
-            {/* Campo 1: Dominio del Negocio */}
+            {/* Campo: Dominio del Negocio */}
             <div>
-              <label 
-                htmlFor="domain-input"
-                className="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-2"
-              >
-                1. Ingrese el dominio web de su empresa
-              </label>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                <label 
+                  htmlFor="domain-input"
+                  className="block text-xs font-extrabold uppercase tracking-wider text-slate-700"
+                >
+                  Ingrese el sitio web o dominio de su empresa
+                </label>
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full inline-flex items-center space-x-1">
+                  <span>⚡ Detección automática de sector y rubro activa</span>
+                </span>
+              </div>
               
               <div className="relative">
                 <input
                   id="domain-input"
                   type="text"
                   required
-                  placeholder="ejemplo: suempresa.pe o miclinica.com"
+                  placeholder="ejemplo: suempresa.pe o clinica.com"
                   value={domain}
                   onChange={(e) => {
                     setDomain(e.target.value);
@@ -116,56 +86,6 @@ export default function LandingPage({ onStartScan, defaultDomain = '', defaultRu
               {inputError && (
                 <p className="text-xs text-red-600 font-bold mt-1.5">{inputError}</p>
               )}
-            </div>
-
-            {/* Campo 2: Selector de Rubro (Alimenta el motor del Bloque B) */}
-            <div>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2.5">
-                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
-                  2. Seleccione el rubro de su actividad comercial
-                </label>
-                <span className="text-[11px] font-bold text-terracota-600">
-                  * Alimenta la priorización de riesgo del Bloque B
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {RUBRO_OPTIONS.map((item) => {
-                  const isSelected = rubro === item.id;
-                  return (
-                    <button
-                      type="button"
-                      key={item.id}
-                      onClick={() => setRubro(item.id)}
-                      className={`p-4 rounded-2xl border-2 text-left transition-all ${
-                        isSelected
-                          ? 'bg-navy-950 text-white border-navy-950 shadow-md ring-2 ring-terracota-500/50'
-                          : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-black uppercase tracking-wider">
-                          {item.label}
-                        </span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                          isSelected ? 'bg-terracota-600 text-white' : 'bg-slate-200 text-slate-700'
-                        }`}>
-                          {item.iconText}
-                        </span>
-                      </div>
-                      <p className={`text-[11px] leading-relaxed line-clamp-2 ${
-                        isSelected ? 'text-slate-300' : 'text-slate-500'
-                      }`}>
-                        {item.description}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <p className="text-[11px] text-slate-500 mt-2 font-medium">
-                💡 Este dato no es decorativo: le permite al motor de IA determinar si su banco de datos contiene información sensible y calcular el rango exacto de multas aplicable bajo el D.S. 016-2024-JUS.
-              </p>
             </div>
 
             {/* Botón CTA Principal */}
@@ -187,28 +107,28 @@ export default function LandingPage({ onStartScan, defaultDomain = '', defaultRu
               <button
                 type="button"
                 onClick={() => handleSelectPreset('clinica-sanborja.pe', 'clinica')}
-                className="p-2.5 rounded-xl text-left bg-red-50 hover:bg-red-100 border border-red-200 transition-colors"
+                className="p-3 rounded-xl text-left bg-red-50 hover:bg-red-100 border border-red-200 transition-colors"
               >
                 <div className="text-xs font-black text-red-900">Clínica San Borja</div>
-                <div className="text-[11px] text-red-700">Alto Riesgo: DMARC ausente + Brechas</div>
+                <div className="text-[11px] text-red-700">Sector Salud (Alto Riesgo: DMARC + Brechas)</div>
               </button>
               
               <button
                 type="button"
                 onClick={() => handleSelectPreset('tienda-peru.pe', 'ecommerce')}
-                className="p-2.5 rounded-xl text-left bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-colors"
+                className="p-3 rounded-xl text-left bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-colors"
               >
                 <div className="text-xs font-black text-amber-900">Tienda Perú</div>
-                <div className="text-[11px] text-amber-700">Alto Riesgo: SSL caduca en 8 días</div>
+                <div className="text-[11px] text-amber-700">E-Commerce (Alto Riesgo: SSL caduca en 8d)</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSelectPreset('nexus-seguro.pe', 'agencia')}
-                className="p-2.5 rounded-xl text-left bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors"
+                className="p-3 rounded-xl text-left bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors"
               >
                 <div className="text-xs font-black text-emerald-900">Nexus Seguro</div>
-                <div className="text-[11px] text-emerald-700">Bajo Riesgo: Protección completa</div>
+                <div className="text-[11px] text-emerald-700">Servicios B2B (Bajo Riesgo: Seguro)</div>
               </button>
             </div>
           </div>

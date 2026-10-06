@@ -3,10 +3,31 @@ import { MOCK_SCENARIOS } from './mockData';
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 /**
+ * Infiere o detecta el rubro según el dominio si no se provee manualmente (flujo n8n automatizado).
+ */
+function inferRubroFromDomain(cleanDomain) {
+  if (cleanDomain.includes('clinica') || cleanDomain.includes('salud') || cleanDomain.includes('hospital') || cleanDomain.includes('med')) {
+    return 'clinica';
+  } else if (cleanDomain.includes('tienda') || cleanDomain.includes('shop') || cleanDomain.includes('store') || cleanDomain.includes('market')) {
+    return 'ecommerce';
+  } else if (cleanDomain.includes('edu') || cleanDomain.includes('colegio') || cleanDomain.includes('academia') || cleanDomain.includes('uni')) {
+    return 'academia';
+  } else if (cleanDomain.includes('delivery') || cleanDomain.includes('express') || cleanDomain.includes('logistica')) {
+    return 'delivery';
+  } else if (cleanDomain.includes('seguro') || cleanDomain.includes('agencia') || cleanDomain.includes('consulting') || cleanDomain.includes('b2b')) {
+    return 'agencia';
+  }
+  return 'clinica'; // Rubro por defecto con mayor exigencia regulatoria (salud/datos sensibles)
+}
+
+/**
  * Ejecuta el escaneo pasivo contra el backend FastAPI (Bloque A) o usa datos calibrados (Plan B).
  */
-export async function executeScan(domain, rubro, useOfflineMock = false) {
+export async function executeScan(domain, rubro = 'auto', useOfflineMock = false) {
   const cleanDomain = domain.trim().toLowerCase().replace(/^https?:\/\//, '').split('/')[0];
+
+  // Resolver rubro automático si el flujo n8n o usuario no lo especifica
+  const resolvedRubro = (!rubro || rubro === 'auto') ? inferRubroFromDomain(cleanDomain) : rubro;
 
   // 1. Modo Simulado / Plan B de Demostración para Auditorios sin Wi-Fi
   if (useOfflineMock) {
@@ -18,7 +39,7 @@ export async function executeScan(domain, rubro, useOfflineMock = false) {
     return {
       scan_id: `offline-${Date.now()}`,
       domain: cleanDomain,
-      rubro,
+      rubro: resolvedRubro,
       timestamp: new Date().toISOString(),
       dns_findings: {
         spf: { present: false, valid: false, details: "No se identificó registro SPF en el DNS público." },
@@ -43,7 +64,7 @@ export async function executeScan(domain, rubro, useOfflineMock = false) {
       priority_findings: [
         {
           finding: "DMARC ausente (Riesgo de Suplantación de Marca)",
-          business_risk: `Su dominio puede ser usado por cibercriminales para enviar correos de phishing suplantando a su empresa ante sus clientes del sector '${rubro}'.`,
+          business_risk: `Su dominio puede ser usado por cibercriminales para enviar correos de phishing suplantando a su empresa ante sus clientes del sector '${resolvedRubro}'.`,
           legal_reference: "Art. 38 del D.S. 016-2024-JUS — Infracción Grave en medidas técnicas de seguridad (Multa de hasta 50 UIT: S/ 257,500).",
           urgency: "alta"
         },
@@ -54,7 +75,7 @@ export async function executeScan(domain, rubro, useOfflineMock = false) {
           urgency: "alta"
         }
       ],
-      summary_for_owner: `Su empresa (${rubro}) presenta un nivel de riesgo ALTO (65/100). Es urgente activar el protocolo DMARC para impedir que terceros usen su nombre y resetear las contraseñas del personal.`,
+      summary_for_owner: `Su empresa (${resolvedRubro}) presenta un nivel de riesgo ALTO (65/100). Es urgente activar el protocolo DMARC para impedir que terceros usen su nombre y resetear las contraseñas del personal.`,
       legal_disclaimer: "Diagnóstico orientativo, no dictamen legal vinculante conforme al D.S. 016-2024-JUS.",
       status: "completed"
     };
@@ -65,7 +86,7 @@ export async function executeScan(domain, rubro, useOfflineMock = false) {
     const response = await fetch(`${API_BASE_URL}/scan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ domain: cleanDomain, rubro })
+      body: JSON.stringify({ domain: cleanDomain, rubro: resolvedRubro })
     });
 
     if (!response.ok) {

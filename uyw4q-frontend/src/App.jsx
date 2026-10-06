@@ -11,26 +11,28 @@ export default function App() {
   const [currentView, setCurrentView] = useState('landing'); // 'landing' | 'loading' | 'dashboard'
   const [scanData, setScanData] = useState(null);
   const [activeDomain, setActiveDomain] = useState('');
-  const [activeRubro, setActiveRubro] = useState('clinica');
+  const [activeRubro, setActiveRubro] = useState('auto'); // Detección automática en n8n
   const [isOfflineMode, setIsOfflineMode] = useState(true); // Default true para garantizar demo infalible sin setup extra
   const [showIncidentModal, setShowIncidentModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const handleStartScan = async (domain, rubro) => {
+  const handleStartScan = async (domain, rubro = 'auto') => {
     setActiveDomain(domain);
     setActiveRubro(rubro);
     setCurrentView('loading');
     setErrorMsg('');
 
     try {
-      // Simulación de tiempo de carga mínimo (3.2s) para que el usuario/jurado
-      // aprecie la pantalla de carga interactiva y sus mensajes cambiantes (Bloque C, Secc. 3.2)
+      // Simulación de tiempo de carga mínimo para observar el análisis dinámico de la demo
       const [result] = await Promise.all([
         executeScan(domain, rubro, isOfflineMode),
         new Promise((resolve) => setTimeout(resolve, 3400))
       ]);
 
       setScanData(result);
+      if (result?.rubro) {
+        setActiveRubro(result.rubro);
+      }
       setCurrentView('dashboard');
     } catch (err) {
       console.error("Fallo durante el diagnóstico:", err);
@@ -55,7 +57,7 @@ export default function App() {
         setIsOfflineMode={setIsOfflineMode}
         onOpenIncidentModal={() => setShowIncidentModal(true)}
         activeDomain={activeDomain}
-        activeRubro={activeRubro}
+        activeRubro={activeRubro !== 'auto' ? activeRubro : (scanData?.rubro || 'Automático')}
         currentView={currentView}
       />
 
@@ -69,20 +71,19 @@ export default function App() {
         </div>
       )}
 
-      {/* Contenido Principal de las 6 Pantallas */}
+      {/* Contenido Principal de las Pantallas */}
       <main className="flex-1">
         {currentView === 'landing' && (
           <LandingPage
             onStartScan={handleStartScan}
             defaultDomain={activeDomain}
-            defaultRubro={activeRubro}
           />
         )}
 
         {currentView === 'loading' && (
           <LoadingScreen
             domain={activeDomain}
-            rubro={activeRubro}
+            rubro={activeRubro !== 'auto' ? activeRubro : 'detectando sector...'}
           />
         )}
 
@@ -99,7 +100,7 @@ export default function App() {
       {showIncidentModal && (
         <IncidentNotificationModal
           initialDomain={activeDomain || 'empresa-ejemplo.pe'}
-          initialRubro={activeRubro || 'clinica'}
+          initialRubro={scanData?.rubro || activeRubro || 'clinica'}
           onClose={() => setShowIncidentModal(false)}
         />
       )}
